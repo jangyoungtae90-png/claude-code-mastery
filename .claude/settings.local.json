@@ -1,0 +1,28 @@
+{
+  "development": {
+    "localPort": 8000,
+    "editorPath": "/Users/youngtae/workspace/claude-code-mastery",
+    "preferredBrowser": "Chrome",
+    "devToolsOpen": true
+  },
+  "paths": {
+    "htmlEntry": "index.html",
+    "cssDir": "css/",
+    "jsDir": "js/",
+    "assetsDir": "assets/"
+  },
+  "tailwind": {
+    "cdnUrl": "https://cdn.tailwindcss.com",
+    "useLocal": false
+  },
+  "customSettings": {
+    "autoReloadOnChange": true,
+    "prettifyOnSave": false,
+    "lintOnSave": false
+  },
+  "permissions": {
+    "allow": [
+      "Bash"
+    ]
+  }
+}

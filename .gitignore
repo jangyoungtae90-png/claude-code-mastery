@@ -1,0 +1,47 @@
+# 개발 환경
+node_modules/
+.env
+.env.local
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# 빌드 결과물
+dist/
+build/
+*.min.js
+*.min.css
+
+# 로그
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 임시 파일
+tmp/
+temp/
+.cache/
+
+# 프로젝트 특정
+assets/pdf/*.pdf
+assets/images/*-temp.*
