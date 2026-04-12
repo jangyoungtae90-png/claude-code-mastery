@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할 일 목록 앱</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8">
+    <div class="max-w-2xl mx-auto">
+        <!-- 제목 -->
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">
+            📝 할 일 목록
+        </h1>
+
+        <!-- 메인 카드 컨테이너 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 space-y-6">
+            <!-- 입력 섹션 -->
+            <div class="space-y-3">
+                <label for="todo-input" class="block text-sm font-medium text-gray-700">
+                    새로운 할 일 추가
+                </label>
+                <div class="flex gap-2">
+                    <!-- 할 일 입력 필드 -->
+                    <input
+                        type="text"
+                        id="todo-input"
+                        placeholder="할 일을 입력해주세요..."
+                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                    <!-- 추가 버튼 -->
+                    <button
+                        id="add-btn"
+                        class="px-6 py-2 bg-blue-500 text-white font-medium rounded-lg hover:bg-blue-600 transition duration-200 active:scale-95"
+                    >
+                        추가
+                    </button>
+                </div>
+            </div>
+
+            <!-- 할 일 개수 표시 -->
+            <div class="text-sm text-gray-600">
+                총 <span id="total-count">0</span>개 | 완료됨 <span id="completed-count">0</span>개
+            </div>
+
+            <!-- 할 일 목록 -->
+            <div id="todo-list" class="space-y-2">
+                <!-- 할 일 항목들이 여기 추가됩니다 -->
+            </div>
+
+            <!-- 비어있을 때 보여주는 메시지 -->
+            <div id="empty-message" class="text-center py-8 text-gray-400">
+                <p class="text-lg">아직 할 일이 없습니다!</p>
+                <p class="text-sm">위에서 새로운 할 일을 추가해보세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 할 일 데이터를 저장할 배열
+        let todos = [];
+
+        // HTML 요소들을 변수에 저장 (자주 사용하므로 미리 선택)
+        const todoInput = document.getElementById('todo-input');
+        const addBtn = document.getElementById('add-btn');
+        const todoList = document.getElementById('todo-list');
+        const emptyMessage = document.getElementById('empty-message');
+        const totalCount = document.getElementById('total-count');
+        const completedCount = document.getElementById('completed-count');
+
+        /**
+         * 새로운 할 일을 추가하는 함수
+         * 1. 입력 필드의 값을 가져옵니다
+         * 2. 공백 체크를 합니다
+         * 3. 새 할 일 객체를 생성해서 배열에 추가합니다
+         * 4. 화면을 다시 그립니다
+         */
+        function addTodo() {
+            const text = todoInput.value.trim(); // 앞뒤 공백 제거
+
+            // 입력값이 비어있으면 함수 종료
+            if (text === '') {
+                alert('할 일을 입력해주세요!');
+                return;
+            }
+
+            // 새로운 할 일 객체 생성
+            // id: 고유 번호 (현재 시간 사용)
+            // text: 할 일 텍스트
+            // completed: 완료 여부 (처음엔 false)
+            const newTodo = {
+                id: Date.now(),
+                text: text,
+                completed: false
+            };
+
+            todos.push(newTodo); // 배열에 추가
+            todoInput.value = ''; // 입력 필드 비우기
+            todoInput.focus(); // 입력 필드에 포커스 (다시 입력할 수 있도록)
+
+            renderTodos(); // 화면 업데이트
+        }
+
+        /**
+         * 할 일을 삭제하는 함수
+         * @param {number} id - 삭제할 할 일의 고유 번호
+         */
+        function deleteTodo(id) {
+            // 배열을 필터링해서 일치하는 id를 제외합니다
+            todos = todos.filter(todo => todo.id !== id);
+            renderTodos(); // 화면 업데이트
+        }
+
+        /**
+         * 할 일의 완료 상태를 토글하는 함수
+         * @param {number} id - 상태를 바꿀 할 일의 고유 번호
+         */
+        function toggleTodo(id) {
+            // find(): 조건을 만족하는 첫 번째 요소를 찾습니다
+            const todo = todos.find(todo => todo.id === id);
+
+            if (todo) {
+                todo.completed = !todo.completed; // 완료 상태를 반대로 바꿈
+                renderTodos(); // 화면 업데이트
+            }
+        }
+
+        /**
+         * 할 일 목록을 화면에 그리는 함수
+         * 1. todos 배열을 반복문으로 순회
+         * 2. 각 할 일을 HTML로 변환
+         * 3. 할 일 목록에 추가
+         */
+        function renderTodos() {
+            todoList.innerHTML = ''; // 기존 내용 삭제
+
+            // todos 배열이 비어있으면 빈 메시지 표시
+            if (todos.length === 0) {
+                emptyMessage.classList.remove('hidden');
+            } else {
+                emptyMessage.classList.add('hidden');
+            }
+
+            // 각 할 일을 순회하면서 HTML 생성
+            todos.forEach(todo => {
+                // 할 일 항목 컨테이너 생성
+                const todoItem = document.createElement('div');
+                todoItem.className = 'flex items-center gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition';
+
+                // 완료 상태에 따라 다른 스타일 적용
+                if (todo.completed) {
+                    todoItem.classList.add('opacity-60'); // 투명도 낮춤
+                }
+
+                // 할 일 항목의 HTML 코드 생성
+                todoItem.innerHTML = `
+                    <!-- 체크박스 -->
+                    <input
+                        type="checkbox"
+                        ${todo.completed ? 'checked' : ''}
+                        onchange="toggleTodo(${todo.id})"
+                        class="w-5 h-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                    <!-- 할 일 텍스트 (완료 상태에서 줄이 그어짐) -->
+                    <span class="flex-1 text-gray-800 ${todo.completed ? 'line-through text-gray-400' : ''}">
+                        ${todo.text}
+                    </span>
+                    <!-- 삭제 버튼 -->
+                    <button
+                        onclick="deleteTodo(${todo.id})"
+                        class="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition duration-200 active:scale-95"
+                    >
+                        삭제
+                    </button>
+                `;
+
+                todoList.appendChild(todoItem); // 목록에 항목 추가
+            });
+
+            updateCounts(); // 통계 업데이트
+        }
+
+        /**
+         * 할 일 개수와 완료된 개수를 업데이트하는 함수
+         */
+        function updateCounts() {
+            const total = todos.length; // 전체 개수
+            const completed = todos.filter(todo => todo.completed).length; // 완료된 개수
+
+            totalCount.textContent = total;
+            completedCount.textContent = completed;
+        }
+
+        // 이벤트 리스너 등록
+        // 추가 버튼 클릭 시 할 일 추가
+        addBtn.addEventListener('click', addTodo);
+
+        // 엔터 키로도 할 일 추가할 수 있도록
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // 초기 렌더링 (비어있는 상태)
+        renderTodos();
+    </script>
+</body>
+</html>

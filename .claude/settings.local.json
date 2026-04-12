@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash"
+    ]
+  },
+  "outputStyle": "Begi  er Friendly",
   "development": {
     "localPort": 8000,
     "editorPath": "/Users/youngtae/workspace/claude-code-mastery",
@@ -19,10 +25,5 @@
     "autoReloadOnChange": true,
     "prettifyOnSave": false,
     "lintOnSave": false
-  },
-  "permissions": {
-    "allow": [
-      "Bash"
-    ]
   }
 }
