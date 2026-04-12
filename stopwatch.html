@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스톱워치</title>
+    <!-- Tailwind CSS를 CDN에서 가져옵니다 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <!-- 전체 페이지의 배경과 레이아웃을 설정합니다 -->
+    <div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-600">
+        <!-- 스톱워치 카드 컨테이너 -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-80">
+            <!-- 제목 -->
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">스톱워치</h1>
+
+            <!-- 시간 표시 영역 -->
+            <!-- 큰 글씨로 시간을 표시하고, 모노스페이스 폰트로 정렬이 깔끔하게 보이도록 합니다 -->
+            <div class="bg-gray-100 rounded-lg p-8 mb-8 text-center">
+                <div class="text-6xl font-mono font-bold text-gray-800" id="timeDisplay">
+                    00:00:00
+                </div>
+            </div>
+
+            <!-- 버튼 영역 -->
+            <div class="flex gap-4">
+                <!-- 시작/일시정지 버튼 -->
+                <!-- JavaScript에서 상태에 따라 색과 텍스트를 변경합니다 -->
+                <button
+                    id="startPauseBtn"
+                    class="flex-1 py-3 px-6 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors duration-200"
+                >
+                    시작
+                </button>
+
+                <!-- 리셋 버튼 -->
+                <button
+                    id="resetBtn"
+                    class="flex-1 py-3 px-6 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors duration-200"
+                >
+                    리셋
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 스톱워치 상태를 관리하는 변수들 =====
+
+        // 경과한 시간을 저장합니다 (밀리초 단위)
+        let elapsedTime = 0;
+
+        // 현재 스톱워치가 실행 중인지 여부를 저장합니다
+        let isRunning = false;
+
+        // setInterval의 ID를 저장합니다 (나중에 멈출 때 필요)
+        let intervalId = null;
+
+        // DOM 요소들을 미리 선택해서 저장합니다
+        const timeDisplay = document.getElementById('timeDisplay');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // ===== 시간을 표시 형식으로 변환하는 함수 =====
+        // 예: 3661000 밀리초 → "01:01:01"
+        function formatTime(milliseconds) {
+            // 전체 시간을 1000으로 나누어 초 단위로 변환합니다
+            const totalSeconds = Math.floor(milliseconds / 1000);
+
+            // 시, 분, 초를 계산합니다
+            const hours = Math.floor(totalSeconds / 3600);        // 1시간 = 3600초
+            const minutes = Math.floor((totalSeconds % 3600) / 60); // 남은 초를 60으로 나눔
+            const seconds = totalSeconds % 60;                     // 60으로 나눈 나머지가 초
+
+            // 두 자리 숫자로 포맷합니다 (예: 5 → "05")
+            // padStart(2, '0')는 문자열 앞에 '0'을 붙여서 최소 2자리로 만듭니다
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // ===== 화면에 시간을 업데이트하는 함수 =====
+        function updateDisplay() {
+            timeDisplay.textContent = formatTime(elapsedTime);
+        }
+
+        // ===== 시작/일시정지 버튼 클릭 시 실행되는 함수 =====
+        function toggleStartPause() {
+            if (isRunning) {
+                // 스톱워치가 실행 중이면 일시정지합니다
+                clearInterval(intervalId);
+                isRunning = false;
+                startPauseBtn.textContent = '재개';
+                startPauseBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                startPauseBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+            } else {
+                // 스톱워치가 멈춰있으면 시작합니다
+                isRunning = true;
+                startPauseBtn.textContent = '일시정지';
+                startPauseBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                startPauseBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+
+                // setInterval을 사용해서 100밀리초마다 시간을 증가시킵니다
+                // 100ms마다 업데이트하면 더 부드러운 애니메이션처럼 보입니다
+                intervalId = setInterval(() => {
+                    elapsedTime += 100;
+                    updateDisplay();
+                }, 100);
+            }
+        }
+
+        // ===== 리셋 버튼 클릭 시 실행되는 함수 =====
+        function reset() {
+            // 실행 중이면 멈춥니다
+            if (isRunning) {
+                clearInterval(intervalId);
+                isRunning = false;
+            }
+
+            // 모든 값을 초기화합니다
+            elapsedTime = 0;
+            updateDisplay();
+
+            // 버튼 상태를 초기화합니다
+            startPauseBtn.textContent = '시작';
+            startPauseBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            startPauseBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+        }
+
+        // ===== 버튼에 클릭 이벤트를 연결합니다 =====
+        startPauseBtn.addEventListener('click', toggleStartPause);
+        resetBtn.addEventListener('click', reset);
+    </script>
+</body>
+</html>
